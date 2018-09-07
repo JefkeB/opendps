@@ -56,7 +56,11 @@ bool pwrctl_set_vout(uint32_t value_mv)
 {
     /** @todo Check with max Vout, currently filtered by ui.c */
     v_out = value_mv;
+#ifdef DPS3003
+    if (v_out_enabled || 1) {
+#else
     if (v_out_enabled) {
+#endif
         /** Needed for the DPS5005 "communications version" (the one with BT/USB) */
         DAC_DHR12R1 = pwrctl_calc_vout_dac(v_out);
     }
@@ -133,6 +137,9 @@ void pwrctl_enable_vout(bool enable)
         gpio_clear(GPIOB, GPIO11);  // B11 is power control on '5005
 #endif
     } else {
+#ifdef DPS3003
+      (void) pwrctl_set_vout(0);
+#endif
 #ifdef DPS5015
         //gpio_set(GPIOA, GPIO9);    // gpio_set(GPIOB, GPIO11);
         gpio_clear(GPIOB, GPIO11); // B11 is fan control on '5015

@@ -200,7 +200,11 @@ static void cv_enable(bool enabled)
         saved_u = cv_voltage.value;
         saved_i = cv_current.value;
         (void) pwrctl_set_vout(10 * cv_voltage.value);
+#ifdef CONFIG_CV_IS_VOLTAGE_LIMITING
+        (void) pwrctl_set_iout(cv_current.value);
+#else
         (void) pwrctl_set_iout(CONFIG_DPS_MAX_CURRENT);
+#endif
         (void) pwrctl_set_ilimit(cv_current.value);
         pwrctl_enable_vout(true);
     } else {
@@ -234,6 +238,9 @@ static void current_changed(ui_number_t *item)
 {
     saved_i = item->value;
     (void) pwrctl_set_ilimit(item->value);
+#ifdef CONFIG_CV_IS_VOLTAGE_LIMITING
+    (void) pwrctl_set_iout(item->value);
+#endif
 }
 
 /**

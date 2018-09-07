@@ -26,6 +26,9 @@ TINT ?= ffffff
 # Enable CC mode
 CC_ENABLE ?= 1
 
+# Should we completely halt on overcurrent, or just limit the voltage?
+CV_IS_VOLTAGE_LIMITING ?= 1
+
 GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
 CFLAGS = -I. -DCONFIG_DPS_MAX_CURRENT=$(MAX_CURRENT) -DGIT_VERSION=\"$(GIT_VERSION)\" -Wno-missing-braces
 
@@ -60,6 +63,10 @@ OBJS = \
 ifeq ($(CC_ENABLE),1)
 	CFLAGS +=-DCONFIG_CC_ENABLE
 	OBJS += func_cc.o
+endif
+
+ifeq ($(CV_IS_VOLTAGE_LIMITING),1)
+	CFLAGS +=-DCONFIG_CV_IS_VOLTAGE_LIMITING
 endif
 
 ifeq ($(SPLASH_SCREEN),1)

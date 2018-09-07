@@ -222,18 +222,17 @@ static void handle_ocp(uint16_t raw)
 {
     static uint32_t ocp_count = 0;
     static uint32_t last_tick_counter = 0;
+#ifdef CONFIG_CV_IS_VOLTAGE_LIMITING
+    return;
+#endif
     if (last_tick_counter+1 == adc_counter) {
         ocp_count++;
         last_tick_counter++;
-#ifndef CONFIG_CV_IS_VOLTAGE_LIMITING
         if (ocp_count == OCP_FILTER_COUNT) {
             i_out_trig_adc = raw;
             pwrctl_enable_vout(false);
             event_put(event_ocp, 0);
         }
-#else
-        (void) raw;
-#endif
     } else {
         ocp_count = 0;
         last_tick_counter = adc_counter;
